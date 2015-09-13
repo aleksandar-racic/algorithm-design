@@ -1,15 +1,20 @@
 package com.codlex.algorithms.unionfind;
 
+import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.StdRandom;
 
 public class PercolationStats {
 	
 	private int n;
 	private int t;
-	int[] fields;
-	double[] results;
+	private double[] results;
 	
 	public PercolationStats(int n, int t){
+		
+		if (n <= 0 || t <= 0){
+			throw new IllegalArgumentException();
+		}
+		
 		this.results = new double [t];
 		this.t = t;
 		this.n = n;
@@ -26,22 +31,24 @@ public class PercolationStats {
 //		}
 	} // perform T independent experiments on an N-by-N grid
 	
-	private void randomizer(int n){
-		this.fields = new int [n * n];
+	private int[] randomizer(int n){
+		int[] fields = new int [n * n];
 		for (int i = 0; i < n * n; i++){
-			this.fields[i] = i + 1;
+			fields[i] = i + 1;
 		}
-		StdRandom.shuffle(this.fields);	
+		StdRandom.shuffle(fields);
+		
+		return fields;
 	}
 	
 	private double tester(int n){
 		
 		Percolation percolation = new Percolation(n);
-		randomizer(n);
+		int[] fields = randomizer(n);
 		int field = 0;
 		
 		while (!percolation.percolates()) {
-			int toOpen = this.fields[field];
+			int toOpen = fields[field];
 			//System.out.println("toOpen: " + toOpen);
 			percolation.open(reverseX(toOpen, n), reverseY(toOpen, n));
 			field = field + 1;
@@ -89,13 +96,20 @@ public class PercolationStats {
 		return mean() + ((1.96 * stddev()) / Math.sqrt(t));
 	} // high endpoint of 95% confidence interval
 	
-
-	public static void main(String[] args){
-		PercolationStats percolationstats = new PercolationStats(200, 100);
-		System.out.println(percolationstats.mean());
-		System.out.println(percolationstats.stddev());
-		System.out.println(percolationstats.confidenceLo());
-		System.out.println(percolationstats.confidenceHi());
-	} // test client (described below)
+	public static void main(String[] args) {
+		PercolationStats percolationStats = new PercolationStats(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+		
+		StdOut.printf("mean\t= %f\n", percolationStats.mean());
+		StdOut.printf("stddev\t= %f\n", percolationStats.stddev());
+		StdOut.printf("95%% confidence interval\t= %f, %f\n", percolationStats.confidenceLo(), percolationStats.confidenceHi());
+	}
 	
+//	public static void main(String[] args){
+//		PercolationStats percolationstats = new PercolationStats(200, 100);
+//		System.out.println(percolationstats.mean());
+//		System.out.println(percolationstats.stddev());
+//		System.out.println(percolationstats.confidenceLo());
+//		System.out.println(percolationstats.confidenceHi());
+//	} // test client (described below)
+//	
 }

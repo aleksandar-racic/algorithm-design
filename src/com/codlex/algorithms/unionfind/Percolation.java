@@ -14,20 +14,29 @@ public class Percolation {
 	private int source;
 	
 	public Percolation(int n) {
+		
+		if (n <= 0){
+			throw new IllegalArgumentException();
+		}
+		
 		this.n = n;
 		this.table = new boolean[n][n];
 		this.unionFindPercolate = new WeightedQuickUnionUF(n * n + 2);
 		this.unionFindFull = new WeightedQuickUnionUF(n * n + 1);
 		this.source = 0;
-		for (int j = 1; j < n+1; j++) {
-			this.unionFindFull.union(source, calculator(1, j));
-			this.unionFindPercolate.union(source, calculator(1, j));
-			this.unionFindPercolate.union(calculator(n, j), this.n * this.n + 1 );
-		}
+//		for (int j = 1; j < n+1; j++) {
+//			this.unionFindFull.union(this.source, calculator(1, j));
+//			this.unionFindPercolate.union(this.source, calculator(1, j));
+//			this.unionFindPercolate.union(calculator(n, j), this.n * this.n + 1 );
+//		}
 	} // create N-by-N grid, with all sites blocked
 	   
 	public void open(int i, int j){
 		this.table[i-1][j-1] = true;
+		
+		if (i <= 0 || j <= 0 || i > n || j > n){
+			throw new IndexOutOfBoundsException();
+		}
 		
 		if (i - 1 > 0 && isOpen(i-1,j)) {
 			this.unionFindFull.union(calculator(i, j), calculator(i-1, j));
@@ -49,9 +58,23 @@ public class Percolation {
 			this.unionFindPercolate.union(calculator(i, j), calculator(i, j + 1));
 		}
 		
+		if (i == 1){
+			this.unionFindFull.union(this.source, calculator(i, j));
+			this.unionFindPercolate.union(this.source, calculator(i, j));
+		}
+		
+		if (i == n){
+			this.unionFindPercolate.union(this.n * this.n + 1, calculator(i, j));
+		}
+		
 	} // open site (row i, column j) if it is not open already
 	
 	public boolean isOpen(int i, int j){
+		
+		if (i <= 0 || j <= 0 || i > n || j > n){
+			throw new IndexOutOfBoundsException();
+		}
+		
 		return this.table[i-1][j-1];
 	} // is site (row i, column j) open?
 	   
@@ -60,6 +83,11 @@ public class Percolation {
 	}
 	
 	public boolean isFull(int i, int j){
+		
+		if (i <= 0 || j <= 0 || i > n || j > n){
+			throw new IndexOutOfBoundsException();
+		}
+		
 		return this.unionFindFull.connected(source, calculator(i, j)) && isOpen(i, j);
 	} // is site (row i, column j) full?
 	   
@@ -69,7 +97,7 @@ public class Percolation {
 
 	public static void main(String[] args){
 		
-		Percolation percolation = new Percolation(3);
+		Percolation percolation = new Percolation(1);
 		
 		while (true) {
 			String command = StdIn.readString();
